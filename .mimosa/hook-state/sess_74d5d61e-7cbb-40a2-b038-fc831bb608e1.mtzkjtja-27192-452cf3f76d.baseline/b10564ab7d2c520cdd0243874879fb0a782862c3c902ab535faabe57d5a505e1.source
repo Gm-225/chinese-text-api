@@ -9,7 +9,6 @@ Endpoints:
   GET  /health    - 健康检查
 """
 import math
-import os
 import re
 from collections import Counter
 
@@ -18,12 +17,7 @@ import jieba.analyse
 import uvicorn
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
-
-try:
-    from snownlp import SnowNLP
-    HAS_SNOWNLP = True
-except ImportError:
-    HAS_SNOWNLP = False
+from snownlp import SnowNLP
 
 app = FastAPI(
     title="Chinese Text Intelligence API",
@@ -44,17 +38,8 @@ class BatchInput(BaseModel):
 
 def get_sentiment(text: str) -> dict:
     """情感分析：返回正负面分数"""
-    if HAS_SNOWNLP:
-        s = SnowNLP(text)
-        score = s.sentiments
-    else:
-        # 降级方案：基于正面/负面词典的简单匹配
-        pos_words = {"好", "推荐", "喜欢", "优秀", "太好了", "满意", "便宜", "快", "棒", "免费", "高效", "方便"}
-        neg_words = {"差", "烂", "垃圾", "退货", "退款", "失望", "恶心", "贵", "慢", "坑", "骗"}
-        pos = sum(1 for w in pos_words if w in text)
-        neg = sum(1 for w in neg_words if w in text)
-        total = pos + neg
-        score = pos / total if total > 0 else 0.5
+    s = SnowNLP(text)
+    score = s.sentiments  # 0~1，越接近1越正面
     if score > 0.7:
         label = "positive"
     elif score < 0.3:
@@ -66,7 +51,6 @@ def get_sentiment(text: str) -> dict:
         "positive_score": round(score, 4),
         "negative_score": round(1 - score, 4),
         "confidence": round(abs(score - 0.5) * 2, 4),
-        "engine": "snownlp" if HAS_SNOWNLP else "keyword_match",
     }
 
 
@@ -195,5 +179,4 @@ async def batch_sentiment(input_data: BatchInput):
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8899))
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    uvicorn.run(app, host="0.0.0.0", port=8899)

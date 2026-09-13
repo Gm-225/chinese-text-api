@@ -1,14 +1,14 @@
 {
   "schemaVersion": "mimosa-hook-status/v1",
-  "recordedAt": "2026-09-13T08:13:26.284Z",
+  "recordedAt": "2026-09-13T08:54:14.747Z",
   "sessionId": "sess_74d5d61e-7cbb-40a2-b038-fc831bb608e1",
   "event": "PostToolUse",
-  "toolName": "Write",
-  "file": "railway.json",
+  "toolName": "Edit",
+  "file": "main.py",
   "outcome": "clear",
   "coverage": "complete",
   "findingCount": 0,
-  "durationMs": 8,
+  "durationMs": 25,
   "hostState": "hook_complete",
   "reportHint": ".mimosa/reports/"
 }
